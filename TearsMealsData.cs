@@ -96,6 +96,28 @@ public class MaterialDataEntry
     public int SpiceBoostMaxHeartLevel { get; set; }
 
     public int SpiceBoostStaminaLevel { get; set; }
+
+    public int SpiceBoostSuccessRate { get; set; }
+
+    public MaterialDataEntry Clone()
+    {
+        return new MaterialDataEntry
+        {
+            PictureBookNum = this.PictureBookNum,
+            CookTag = this.CookTag,
+            HitPointRecover = this.HitPointRecover,
+            CureEffectType = this.CureEffectType,
+            CureEffectLevel = this.CureEffectLevel,
+            CureEffectiveTime = this.CureEffectiveTime,
+            BuyingPrice = this.BuyingPrice,
+            SellingPrice = this.SellingPrice,
+            PouchSortKey = this.PouchSortKey,
+            SpiceBoostEffectiveTime = this.SpiceBoostEffectiveTime,
+            SpiceBoostMaxHeartLevel = this.SpiceBoostMaxHeartLevel,
+            SpiceBoostStaminaLevel = this.SpiceBoostStaminaLevel,
+            SpiceBoostSuccessRate = this.SpiceBoostSuccessRate
+        };
+    }
 }
 
 public interface IRecipe
@@ -113,6 +135,8 @@ public interface IRecipe
     public bool CookFailure { get; set; }
 
     public bool CookEMedicine { get; set; }
+
+    IRecipe Clone();
 }
 
 public class RecipeData : IRecipe
@@ -130,6 +154,20 @@ public class RecipeData : IRecipe
     public bool CookFailure { get; set; }
 
     public bool CookEMedicine { get; set; }
+
+    public IRecipe Clone()
+    {
+        return new RecipeData
+        {
+            ResultActorName = this.ResultActorName,
+            Recipe = this.Recipe,
+            PictureBookNum = this.PictureBookNum,
+            BonusHeart = this.BonusHeart,
+            IsSingleRecipe = this.IsSingleRecipe,
+            CookFailure = this.CookFailure,
+            CookEMedicine = this.CookEMedicine
+        };
+    }
 }
 
 public class SingleRecipeData : IRecipe
@@ -147,4 +185,18 @@ public class SingleRecipeData : IRecipe
     public bool CookFailure { get; set; }
 
     public bool CookEMedicine { get; set; }
+
+    public IRecipe Clone()
+    {
+        return new SingleRecipeData
+        {
+            ResultActorName = this.ResultActorName,
+            Recipe = this.Recipe,
+            PictureBookNum = this.PictureBookNum,
+            BonusHeart = this.BonusHeart,
+            IsSingleRecipe = this.IsSingleRecipe,
+            CookFailure = this.CookFailure,
+            CookEMedicine = this.CookEMedicine
+        };
+    }
 }

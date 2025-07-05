@@ -15,4 +15,4 @@ else
     materials = args;
 }
 
-TearsMealsResult finalResult = loader.TearsMealsCook(materials);
+List<TearsMealsResult> finalResult = loader.TearsMealsCook(materials);

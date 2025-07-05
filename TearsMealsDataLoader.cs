@@ -1,5 +1,6 @@
 using Microsoft.VisualBasic;
 using OneOf;
+using OneOf.Types;
 using System.Text.Json;
 
 namespace TearsMeals;
@@ -27,12 +28,109 @@ public class TearsMealsDataLoader
         return TearsMealsData = JsonSerializer.Deserialize<TearsMealsData>(fs) ?? new TearsMealsData();
     }
 
-    public TearsMealsResult TearsMealsCook(string[] materials)
+    public List<TearsMealsResult> ProcessExtract(TearsMealsData mealData, TearsMealsResult result)
+    {
+        List<TearsMealsResult> results = new();
+        List<TearsMealsResult> tempResults = new();
+
+        if (result.Effect != "None" && result.EffectTime > 0)
+        {
+            var worstTimeOutcome = result.Clone();
+            worstTimeOutcome.EffectTime = 60;
+            worstTimeOutcome.ExtractDetails += "Worst time outcome, ";
+            tempResults.Add(worstTimeOutcome);
+
+            var middleTimeOutcome = result.Clone();
+            middleTimeOutcome.EffectTime = 600;
+            middleTimeOutcome.ExtractDetails += "Middle time outcome, ";
+            tempResults.Add(middleTimeOutcome);
+
+            var bestTimeOutcome = result.Clone();
+            bestTimeOutcome.EffectTime = 1800;
+            bestTimeOutcome.ExtractDetails += "Best time outcome, ";
+            tempResults.Add(bestTimeOutcome);
+        }
+        else
+        {
+            tempResults.Add(result);
+        }
+
+        if ((result.HitPointRecover == 0 && result.Effect != "None") || result.Effect == "LifeMaxUp")
+        {
+            foreach (TearsMealsResult timeResult in tempResults)
+            {
+                var worstEffectOutcome = timeResult.Clone();
+                worstEffectOutcome.EffectLevel = mealData.EffectData[result.Effect].MinLv;
+                worstEffectOutcome.ExtractDetails += "Worst effect outcome";
+                results.Add(worstEffectOutcome);
+
+                var bestEffectOutcome = timeResult.Clone();
+                bestEffectOutcome.EffectLevel += mealData.EffectData[result.Effect].SuperSuccessAddVolume;
+                bestEffectOutcome.ExtractDetails += "Best effect outcome";
+                results.Add(bestEffectOutcome);
+            }
+        }
+        else if (result.HitPointRecover == 0 && result.Effect == "None")
+        {
+            foreach (TearsMealsResult timeResult in tempResults)
+            {
+                var bestHealthOutcome = timeResult.Clone();
+                bestHealthOutcome.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
+                bestHealthOutcome.ExtractDetails += "Best health recovery outcome";
+                results.Add(bestHealthOutcome);
+            }
+        }
+        else if (result.Effect != "None")
+        {
+            foreach (TearsMealsResult timeResult in tempResults)
+            {
+                var worstEffectOutcome = timeResult.Clone();
+                worstEffectOutcome.EffectLevel = mealData.EffectData[result.Effect].MinLv;
+                worstEffectOutcome.ExtractDetails += "Worst effect outcome, Neutral health recovery outcome";
+                results.Add(worstEffectOutcome);
+
+                var bestEffectOutcome = timeResult.Clone();
+                bestEffectOutcome.EffectLevel += mealData.EffectData[result.Effect].SuperSuccessAddVolume;
+                bestEffectOutcome.ExtractDetails += "Best effect outcome, Neutral health recovery outcome";
+                results.Add(bestEffectOutcome);
+
+                var worstHealthOutcome = timeResult.Clone();
+                worstHealthOutcome.HitPointRecover = mealData.EffectData["LifeRecover"].MinLv;
+                worstHealthOutcome.ExtractDetails += "Neutral effect outcome, Worst health recovery outcome";
+                results.Add(worstHealthOutcome);
+
+                var bestHealthOutcome = timeResult.Clone();
+                bestHealthOutcome.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
+                bestHealthOutcome.ExtractDetails += "Neutral effect outcome, Best health recovery outcome";
+                results.Add(bestHealthOutcome);
+            }
+        }
+        else
+        {
+            foreach (TearsMealsResult timeResult in tempResults)
+            {
+                var worstHealthOutcome = timeResult.Clone();
+                worstHealthOutcome.HitPointRecover = mealData.EffectData["LifeRecover"].MinLv;
+                worstHealthOutcome.ExtractDetails += "Worst health recovery outcome";
+                results.Add(worstHealthOutcome);
+
+                var bestHealthOutcome = timeResult.Clone();
+                bestHealthOutcome.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
+                bestHealthOutcome.ExtractDetails += "Best health recovery outcome";
+                results.Add(bestHealthOutcome);
+            }
+        }
+
+        return results;
+    }
+
+    public List<TearsMealsResult> TearsMealsCook(string[] materials)
     {
         // Loads the data contained in the data json
         TearsMealsData mealData = LoadData();
 
         // Initialize the result class
+        List<TearsMealsResult> results = new();
         TearsMealsResult result = new()
         {
             SellingPrice = 2,
@@ -78,6 +176,10 @@ public class TearsMealsDataLoader
                         break;
                     }
                 }
+                if (AllOk)
+                {
+                    break;
+                }
             }
         }
         else
@@ -85,7 +187,7 @@ public class TearsMealsDataLoader
             // Multiple unique materias case
             foreach (RecipeData recipe in mealData.RecipeData)
             {
-                List<(string, string)> cookTagListCopy = [.. materialCookTagList];
+                List<(string, string)> usedMaterials = [];
                 string recipeComp = recipe.Recipe;
                 List<string> andParts = [.. recipeComp.Split(" + ")];
                 List<List<string>> partsList = [];
@@ -100,13 +202,13 @@ public class TearsMealsDataLoader
                     bool AndOk = false;
                     foreach (string orPart in andPart)
                     {
-                        foreach ((string, string) materialNameTag in cookTagListCopy)
+                        foreach ((string, string) materialNameTag in materialCookTagList)
                         {
                             (string material, string tag) = materialNameTag;
-                            if (orPart == material || orPart == tag)
+                            if ((orPart == material || orPart == tag) && !usedMaterials.Contains(materialNameTag))
                             {
                                 AndOk = true;
-                                cookTagListCopy.Remove(materialNameTag);
+                                usedMaterials.Add(materialNameTag);
                                 break;
                             }
                         }
@@ -115,20 +217,20 @@ public class TearsMealsDataLoader
                         {
                             break;
                         }
-
-                        if (!AndOk)
-                        {
-                            AllOk = false;
-                            break;
-                        }
                     }
 
-                    if (AllOk)
+                    if (!AndOk)
                     {
-                        foundRecipe = recipe;
-                        result.Recipe = foundRecipe;
+                        AllOk = false;
                         break;
                     }
+
+                }
+                if (AllOk)
+                {
+                    foundRecipe = recipe;
+                    result.Recipe = foundRecipe;
+                    break;
                 }
             }
         }
@@ -178,7 +280,8 @@ public class TearsMealsDataLoader
             result.SellingPrice = 0;
             result.SuperSuccessRate = 0;
 
-            return result;
+            results.Add(result);
+            return results;
         }
 
         // Setting effect, effect level and effect duration
@@ -255,16 +358,28 @@ public class TearsMealsDataLoader
         }
 
         // Hardcoded values for Fairy Tonic and failed meal
-        var _ = new HashSet<string>
+        var hardcodedExceptions = new HashSet<string>
         {
             mealData.SystemData.FairyActorName,
             mealData.SystemData.FailActorName,
             "Item_Cook_O_02"
         };
-        if (_.Contains(result.Recipe.ResultActorName))
+        if (hardcodedExceptions.Contains(result.Recipe.ResultActorName))
         {
             effectType = "None";
             effectLevel = 0.0f;
+            effectTime = 0;
+        }
+
+        var hardcodedEffectTime = new HashSet<string>
+        {
+            "LifeMaxUp",
+            "StaminaRecover",
+            "ExStaminaMaxUp",
+            "LifeRepair"
+        };
+        if (hardcodedEffectTime.Contains(effectType))
+        {
             effectTime = 0;
         }
 
@@ -293,6 +408,35 @@ public class TearsMealsDataLoader
         hitPointRecover *= (int)lifeRecoverRate;
         result.HitPointRecover = hitPointRecover;
 
-        return result;
+        // Setting crit chances
+        int superSuccessRate = 0;
+
+        foreach ((string actorName, MaterialDataEntry material) in result.Materials)
+        {
+            superSuccessRate = Math.Max(superSuccessRate, material?.SpiceBoostSuccessRate ?? 0);
+        }
+
+        foreach (SuperSuccessRateListEntry item in mealData.SystemData.SuperSuccessRateList)
+        {
+            if (item.MaterialTypeNum == materialCookTagList.Count)
+            {
+                superSuccessRate += (int)Math.Round(item.Rate);
+                break;
+            }
+        }
+
+        result.SuperSuccessRate = superSuccessRate;
+
+        // Settings all possible combinations of Monster Extract effects, if there's a Monster Extract
+        if (materials.Contains(mealData.SystemData.EnemyExtractActorName))
+        {
+            results = ProcessExtract(mealData, result);
+        }
+        else
+        {
+            results.Add(result);
+        }
+
+        return results;
     }
 }
