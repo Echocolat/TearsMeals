@@ -33,6 +33,8 @@ public class TearsMealsDataLoader
         List<TearsMealsResult> results = new();
         List<TearsMealsResult> tempResults = new();
 
+        result.CriticalDetails = "No critical hit can happen if a Monster Extract is present";
+
         if (result.Effect != "None" && result.EffectTime > 0)
         {
             var worstTimeOutcome = result.Clone();
@@ -154,13 +156,13 @@ public class TearsMealsDataLoader
         List<(string, string)> materialCookTagList = [.. materialCookTagSet];
 
         // Finds the correct recipe
-        IRecipe foundRecipe = GlobalVariables.FailedRecipe;
+        RecipeData foundRecipe = GlobalVariables.FailedRecipe;
         bool AllOk = false;
 
         if (materialCookTagList.Count == 1)
         {
             // Single unique material case
-            foreach (SingleRecipeData singleRecipe in mealData.SingleRecipeData)
+            foreach (RecipeData singleRecipe in mealData.SingleRecipeData)
             {
                 List<(string, string)> cookTagListCopy = [.. materialCookTagList];
                 string recipeComp = singleRecipe.Recipe;
@@ -239,7 +241,7 @@ public class TearsMealsDataLoader
         var uniqueMaterialTags = new HashSet<string>(materialCookTagList.Select(tag => tag.Item2));
         if (materialCookTagList.Any(tag => tag.Item2 == "CookSpice") && uniqueMaterialTags.Count >= 2 && !AllOk)
         {
-            foreach (SingleRecipeData singleRecipe in mealData.SingleRecipeData)
+            foreach (RecipeData singleRecipe in mealData.SingleRecipeData)
             {
                 List<(string, string)> materialsNameTagCopy = new List<(string, string)>(materialCookTagList);
                 string recipeComp = singleRecipe.Recipe;
@@ -427,15 +429,18 @@ public class TearsMealsDataLoader
 
         result.SuperSuccessRate = superSuccessRate;
 
-        // Settings all possible combinations of Monster Extract effects, if there's a Monster Extract
+        // Setting all possible combinations of Monster Extract effects, if there's a Monster Extract
         if (materials.Contains(mealData.SystemData.EnemyExtractActorName))
         {
             results = ProcessExtract(mealData, result);
         }
-        else
+        else if (result.SuperSuccessRate < 100)
         {
             results.Add(result);
         }
+
+        // Setting all possible combinations of Critical Hit effects, if there's no Monster Extract
+
 
         return results;
     }

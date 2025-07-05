@@ -2,7 +2,7 @@ namespace TearsMeals;
 
 public class TearsMealsResult
 {
-    public IRecipe Recipe { get; set; }
+    public RecipeData Recipe { get; set; }
     public string Effect { get; set; } = "None";
     public float EffectLevel { get; set; }
     public int EffectTime { get; set; }

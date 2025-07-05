@@ -14,7 +14,7 @@ public class TearsMealsData
 
     public RecipeData[] RecipeData { get; set; }
 
-    public SingleRecipeData[] SingleRecipeData { get; set; }
+    public RecipeData[] SingleRecipeData { get; set; }
 
     public string[] RecipeCardData { get; set; }
 }
@@ -120,7 +120,7 @@ public class MaterialDataEntry
     }
 }
 
-public interface IRecipe
+public class RecipeData
 {
     public string ResultActorName { get; set; }
 
@@ -136,59 +136,9 @@ public interface IRecipe
 
     public bool CookEMedicine { get; set; }
 
-    IRecipe Clone();
-}
-
-public class RecipeData : IRecipe
-{
-    public string ResultActorName { get; set; }
-
-    public string Recipe { get; set; }
-
-    public int PictureBookNum { get; set; }
-
-    public int BonusHeart { get; set; }
-
-    public bool IsSingleRecipe { get; set; }
-
-    public bool CookFailure { get; set; }
-
-    public bool CookEMedicine { get; set; }
-
-    public IRecipe Clone()
+    public RecipeData Clone()
     {
         return new RecipeData
-        {
-            ResultActorName = this.ResultActorName,
-            Recipe = this.Recipe,
-            PictureBookNum = this.PictureBookNum,
-            BonusHeart = this.BonusHeart,
-            IsSingleRecipe = this.IsSingleRecipe,
-            CookFailure = this.CookFailure,
-            CookEMedicine = this.CookEMedicine
-        };
-    }
-}
-
-public class SingleRecipeData : IRecipe
-{
-    public string ResultActorName { get; set; }
-
-    public string Recipe { get; set; }
-
-    public int PictureBookNum { get; set; }
-
-    public int BonusHeart { get; set; }
-
-    public bool IsSingleRecipe { get; set; }
-
-    public bool CookFailure { get; set; }
-
-    public bool CookEMedicine { get; set; }
-
-    public IRecipe Clone()
-    {
-        return new SingleRecipeData
         {
             ResultActorName = this.ResultActorName,
             Recipe = this.Recipe,
