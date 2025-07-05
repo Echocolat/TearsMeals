@@ -90,9 +90,15 @@ public class MaterialDataEntry
     public int SellingPrice { get; set; }
 
     public int PouchSortKey { get; set; }
+
+    public int SpiceBoostEffectiveTime { get; set; }
+
+    public int SpiceBoostMaxHeartLevel { get; set; }
+
+    public int SpiceBoostStaminaLevel { get; set; }
 }
 
-public class RecipeData
+public interface IRecipe
 {
     public string ResultActorName { get; set; }
 
@@ -102,13 +108,17 @@ public class RecipeData
 
     public int BonusHeart { get; set; }
 
+    public bool IsSingleRecipe { get; set; }
+
     public bool CookFailure { get; set; }
 
     public bool CookEMedicine { get; set; }
 }
 
-public class SingleRecipeData
+public class RecipeData : IRecipe
 {
+    public string ResultActorName { get; set; }
+
     public string Recipe { get; set; }
 
     public int PictureBookNum { get; set; }
@@ -118,4 +128,23 @@ public class SingleRecipeData
     public bool IsSingleRecipe { get; set; }
 
     public bool CookFailure { get; set; }
+
+    public bool CookEMedicine { get; set; }
+}
+
+public class SingleRecipeData : IRecipe
+{
+    public string ResultActorName { get; set; }
+
+    public string Recipe { get; set; }
+
+    public int PictureBookNum { get; set; }
+
+    public int BonusHeart { get; set; }
+
+    public bool IsSingleRecipe { get; set; }
+
+    public bool CookFailure { get; set; }
+
+    public bool CookEMedicine { get; set; }
 }

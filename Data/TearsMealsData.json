@@ -4308,92 +4308,109 @@
     ],
     "SingleRecipeData": [
         {
+            "ResultActorName": "Item_Cook_C_16",
             "Recipe": "Animal_Insect_F",
             "PictureBookNum": 228,
             "BonusHeart": -12,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_O_02",
             "Recipe": "CookOre",
             "PictureBookNum": 146,
             "IsSingleRecipe": true,
             "CookFailure": true
         },
         {
+            "ResultActorName": "Item_Cook_B_21",
             "Recipe": "Item_Fruit_I",
             "PictureBookNum": 14,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_A_10",
             "Recipe": "Item_Material_04",
             "PictureBookNum": 112,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_B_06",
             "Recipe": "CookMeat",
             "PictureBookNum": 4,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_B_23",
             "Recipe": "Item_FishGet_M or Item_InsectGet_K or Item_InsectGet_O or Item_InsectGet_Z",
             "PictureBookNum": 6,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_B_05",
             "Recipe": "CookFish",
             "PictureBookNum": 5,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_A_01",
             "Recipe": "CookMushroom",
             "PictureBookNum": 1,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_I_16",
             "Recipe": "BeeHome",
             "PictureBookNum": 119,
             "BonusHeart": -8,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_B_22",
             "Recipe": "Item_Fruit_K or Item_Fruit_L",
             "PictureBookNum": 15,
             "BonusHeart": -2,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_K_09",
             "Recipe": "Item_Material_05",
             "PictureBookNum": 133,
             "BonusHeart": 2,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_Q_06",
             "Recipe": "Item_PlantGet_S",
             "PictureBookNum": 18,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_B_01",
             "Recipe": "CookPlant",
             "PictureBookNum": 16,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_Q_01",
             "Recipe": "Item_Fruit_M",
             "PictureBookNum": 49,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_B_02",
             "Recipe": "CookFruit",
             "PictureBookNum": 47,
             "IsSingleRecipe": true
         },
         {
+            "ResultActorName": "Item_Cook_O_01",
             "Recipe": "CookForeign",
             "PictureBookNum": 145,
             "IsSingleRecipe": true,
             "CookFailure": true
         },
         {
+            "ResultActorName": "Item_Cook_O_01",
             "Recipe": "CookGolem",
             "PictureBookNum": 145,
             "IsSingleRecipe": true,

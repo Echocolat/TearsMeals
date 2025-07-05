@@ -2,11 +2,11 @@ namespace TearsMeals;
 
 public class TearsMealsResult
 {
-    public RecipeData Recipe { get; set; } = new();
+    public IRecipe Recipe { get; set; }
 
-    public string Effect { get; set; } = "";
+    public string Effect { get; set; } = "None";
 
-    public int EffectLevel { get; set; }
+    public float EffectLevel { get; set; }
 
     public int EffectTime { get; set; }
 
