@@ -39,17 +39,17 @@ public class TearsMealsDataLoader
         {
             var worstTimeOutcome = result.Clone();
             worstTimeOutcome.EffectTime = 60;
-            worstTimeOutcome.ExtractDetails += "Worst time outcome, ";
+            worstTimeOutcome.ExtractDetails += "Worst time outcome (33%), ";
             tempResults.Add(worstTimeOutcome);
 
             var middleTimeOutcome = result.Clone();
             middleTimeOutcome.EffectTime = 600;
-            middleTimeOutcome.ExtractDetails += "Middle time outcome, ";
+            middleTimeOutcome.ExtractDetails += "Middle time outcome (33%), ";
             tempResults.Add(middleTimeOutcome);
 
             var bestTimeOutcome = result.Clone();
             bestTimeOutcome.EffectTime = 1800;
-            bestTimeOutcome.ExtractDetails += "Best time outcome, ";
+            bestTimeOutcome.ExtractDetails += "Best time outcome (33%), ";
             tempResults.Add(bestTimeOutcome);
         }
         else
@@ -63,12 +63,12 @@ public class TearsMealsDataLoader
             {
                 var worstEffectOutcome = timeResult.Clone();
                 worstEffectOutcome.EffectLevel = mealData.EffectData[result.Effect].MinLv;
-                worstEffectOutcome.ExtractDetails += "Worst effect outcome";
+                worstEffectOutcome.ExtractDetails += "Worst effect outcome (50%)";
                 results.Add(worstEffectOutcome);
 
                 var bestEffectOutcome = timeResult.Clone();
                 bestEffectOutcome.EffectLevel += mealData.EffectData[result.Effect].SuperSuccessAddVolume;
-                bestEffectOutcome.ExtractDetails += "Best effect outcome";
+                bestEffectOutcome.ExtractDetails += "Best effect outcome (50%)";
                 results.Add(bestEffectOutcome);
             }
         }
@@ -78,7 +78,7 @@ public class TearsMealsDataLoader
             {
                 var bestHealthOutcome = timeResult.Clone();
                 bestHealthOutcome.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
-                bestHealthOutcome.ExtractDetails += "Best health recovery outcome";
+                bestHealthOutcome.ExtractDetails += "Best health recovery outcome (100%)";
                 results.Add(bestHealthOutcome);
             }
         }
@@ -88,22 +88,22 @@ public class TearsMealsDataLoader
             {
                 var worstEffectOutcome = timeResult.Clone();
                 worstEffectOutcome.EffectLevel = mealData.EffectData[result.Effect].MinLv;
-                worstEffectOutcome.ExtractDetails += "Worst effect outcome, Neutral health recovery outcome";
+                worstEffectOutcome.ExtractDetails += "Worst effect outcome, Neutral health recovery outcome (25%)";
                 results.Add(worstEffectOutcome);
 
                 var bestEffectOutcome = timeResult.Clone();
                 bestEffectOutcome.EffectLevel += mealData.EffectData[result.Effect].SuperSuccessAddVolume;
-                bestEffectOutcome.ExtractDetails += "Best effect outcome, Neutral health recovery outcome";
+                bestEffectOutcome.ExtractDetails += "Best effect outcome, Neutral health recovery outcome (25%)";
                 results.Add(bestEffectOutcome);
 
                 var worstHealthOutcome = timeResult.Clone();
                 worstHealthOutcome.HitPointRecover = mealData.EffectData["LifeRecover"].MinLv;
-                worstHealthOutcome.ExtractDetails += "Neutral effect outcome, Worst health recovery outcome";
+                worstHealthOutcome.ExtractDetails += "Neutral effect outcome, Worst health recovery outcome (25%)";
                 results.Add(worstHealthOutcome);
 
                 var bestHealthOutcome = timeResult.Clone();
                 bestHealthOutcome.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
-                bestHealthOutcome.ExtractDetails += "Neutral effect outcome, Best health recovery outcome";
+                bestHealthOutcome.ExtractDetails += "Neutral effect outcome, Best health recovery outcome (25%)";
                 results.Add(bestHealthOutcome);
             }
         }
@@ -113,14 +113,118 @@ public class TearsMealsDataLoader
             {
                 var worstHealthOutcome = timeResult.Clone();
                 worstHealthOutcome.HitPointRecover = mealData.EffectData["LifeRecover"].MinLv;
-                worstHealthOutcome.ExtractDetails += "Worst health recovery outcome";
+                worstHealthOutcome.ExtractDetails += "Worst health recovery outcome (50%)";
                 results.Add(worstHealthOutcome);
 
                 var bestHealthOutcome = timeResult.Clone();
                 bestHealthOutcome.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
-                bestHealthOutcome.ExtractDetails += "Best health recovery outcome";
+                bestHealthOutcome.ExtractDetails += "Best health recovery outcome (50%)";
                 results.Add(bestHealthOutcome);
             }
+        }
+
+        return results;
+    }
+
+    public List<TearsMealsResult> ProcessCritical(TearsMealsData mealData, TearsMealsResult result)
+    {
+        List<TearsMealsResult> results = new();
+        TearsMealsResult tempResult = result.Clone();
+
+        if (result.SuperSuccessRate < 100)
+        {
+            results.Add(result);
+        }
+
+        // Clamp effect level to at least 1.0
+        tempResult.EffectLevel = MathF.Min(tempResult.EffectLevel, 1.0f);
+
+        if (tempResult.Effect == "None")
+        {
+            var healthCritical = tempResult.Clone();
+            healthCritical.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
+            healthCritical.CriticalDetails += "Health critical (100% if critical)";
+            results.Add(healthCritical);
+        }
+        else if (tempResult.Effect == "LifeMaxUp")
+        {
+            var levelCritical = tempResult.Clone();
+            levelCritical.EffectLevel += mealData.EffectData[levelCritical.Effect].SuperSuccessAddVolume;
+            levelCritical.CriticalDetails += "Level critical (100% if critical)";
+            results.Add(levelCritical);
+        }
+        else if (tempResult.Effect == "StaminaRecover" || tempResult.Effect == "ExStaminaMaxUp")
+        {
+            if (tempResult.EffectLevel >= mealData.EffectData[tempResult.Effect].MaxLv)
+            {
+                var healthCritical = tempResult.Clone();
+                healthCritical.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
+                healthCritical.CriticalDetails += "Health critical (100% if critical)";
+                results.Add(healthCritical);
+            }
+            else
+            {
+                var healthCritical = tempResult.Clone();
+                healthCritical.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
+                healthCritical.CriticalDetails += "Health critical (50% if critical)";
+                results.Add(healthCritical);
+
+                var levelCritical = tempResult.Clone();
+                levelCritical.EffectLevel += mealData.EffectData[levelCritical.Effect].SuperSuccessAddVolume;
+                levelCritical.CriticalDetails += "Level critical (50% if critical)";
+                results.Add(levelCritical);
+            }
+        }
+        else if (tempResult.EffectLevel >= mealData.EffectData[tempResult.Effect].MaxLv)
+        {
+            if (tempResult.HitPointRecover >= mealData.EffectData["LifeRecover"].MaxLv)
+            {
+                var timeCritical = tempResult.Clone();
+                timeCritical.EffectTime += mealData.SystemData.SuperSuccessAddEffectiveTime;
+                timeCritical.CriticalDetails += "Time critical (100% if critical)";
+                results.Add(timeCritical);
+            }
+            else
+            {
+                var healthCritical = tempResult.Clone();
+                healthCritical.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
+                healthCritical.CriticalDetails += "Health critical (50% if critical)";
+                results.Add(healthCritical);
+
+                var timeCritical = tempResult.Clone();
+                timeCritical.EffectTime += mealData.SystemData.SuperSuccessAddEffectiveTime;
+                timeCritical.CriticalDetails += "Time critical (50% if critical)";
+                results.Add(timeCritical);
+            }
+        }
+        else if (tempResult.HitPointRecover >= mealData.EffectData["LifeRecover"].MaxLv)
+        {
+            var levelCritical = tempResult.Clone();
+            levelCritical.EffectLevel += mealData.EffectData[levelCritical.Effect].SuperSuccessAddVolume;
+            levelCritical.CriticalDetails += "Level critical (50% if critical)";
+            results.Add(levelCritical);
+
+            var timeCritical = tempResult.Clone();
+            timeCritical.EffectTime += mealData.SystemData.SuperSuccessAddEffectiveTime;
+            timeCritical.CriticalDetails += "Time critical (50% if critical)";
+            results.Add(timeCritical);
+        }
+        else
+        {
+            var healthCritical = tempResult.Clone();
+            healthCritical.HitPointRecover += mealData.EffectData["LifeRecover"].SuperSuccessAddVolume;
+            healthCritical.CriticalDetails += "Health critical (33% if critical)";
+            results.Add(healthCritical);
+
+            var levelCritical = tempResult.Clone();
+            levelCritical.EffectLevel += mealData.EffectData[levelCritical.Effect].SuperSuccessAddVolume;
+            levelCritical.CriticalDetails += "Level critical (33% if critical)";
+            results.Add(levelCritical);
+
+            var timeCritical = tempResult.Clone();
+            timeCritical.EffectTime += mealData.SystemData.SuperSuccessAddEffectiveTime;
+            timeCritical.CriticalDetails += "Time critical (33% if critical)";
+            results.Add(timeCritical);
         }
 
         return results;
@@ -149,9 +253,9 @@ public class TearsMealsDataLoader
         // Generates the list of unique (material, tag) couples
         HashSet<(string, string)> materialCookTagSet = [];
 
-        foreach ((string actorName, MaterialDataEntry material) in result.Materials)
+        foreach (string actorName in materials)
         {
-            materialCookTagSet.Add((actorName, material.CookTag));
+            materialCookTagSet.Add((actorName, result.Materials[actorName].CookTag));
         }
         List<(string, string)> materialCookTagList = [.. materialCookTagSet];
 
@@ -296,21 +400,22 @@ public class TearsMealsDataLoader
         int bonusStamina = 0;    // unused in game
 
         // CookEnemy Spice happens before Monster Extract and Criticals
-        foreach ((string actorName, MaterialDataEntry material) in result.Materials)
+        foreach (string actorName in materials)
         {
-            if (material.CookTag == "CookEnemy")
+            if (result.Materials[actorName].CookTag == "CookEnemy")
             {
-                bonusTime += material?.SpiceBoostEffectiveTime ?? 0;
-                bonusMaxHeart += material?.SpiceBoostMaxHeartLevel ?? 0;   // unused in game
-                bonusStamina += material?.SpiceBoostStaminaLevel ?? 0;     // unused in game
+                bonusTime += result.Materials[actorName]?.SpiceBoostEffectiveTime ?? 0;
+                bonusMaxHeart += result.Materials[actorName]?.SpiceBoostMaxHeartLevel ?? 0;   // unused in game
+                bonusStamina += result.Materials[actorName]?.SpiceBoostStaminaLevel ?? 0;     // unused in game
             }
         }
 
         // Cycle through each effect
         foreach ((string effectName, EffectDataEntry effect) in mealData.EffectData)
         {
-            int effectMaterialsNum = result.Materials.Values
-                .Where(mat => (mat?.CureEffectType ?? "None") == effectName)
+            int effectMaterialsNum = materials
+                .Where(actorName => result.Materials.TryGetValue(actorName, out var mat)
+                                    && (mat?.CureEffectType ?? "None") == effectName)
                 .Count();
             if (effectMaterialsNum > 0)
             {
@@ -324,19 +429,19 @@ public class TearsMealsDataLoader
                 effectType = effectName;
                 int potencySum = 0;
                 effectTime += bonusTime;
-                foreach ((string actorName, MaterialDataEntry material) in result.Materials)
+                foreach (string actorName in materials)
                 {
-                    if ((material?.CureEffectType ?? "None") == effectName)
+                    if ((result.Materials[actorName]?.CureEffectType ?? "None") == effectName)
                     {
-                        potencySum += material?.CureEffectLevel ?? 0;
+                        potencySum += result.Materials[actorName]?.CureEffectLevel ?? 0;
                     }
                     effectTime += 30;
                 }
 
-                effectTime += result.Materials.Count * effect?.BaseTime ?? 0;
+                effectTime += materials.Length * effect?.BaseTime ?? 0;
                 effectLevel += (effect?.Rate ?? 0) * potencySum;
 
-                // unused in game.Logic is in the game's code, but no material has those properties
+                // unused in game. Logic is in the game's code, but no material has those properties
                 // (SpiceBoostMaxHeartLevel and SpiceBoostStaminaLevel)
                  if (effectType == "LifeMaxUp")
                  {
@@ -393,9 +498,9 @@ public class TearsMealsDataLoader
         int hitPointRecover = 0;
         float lifeRecoverRate;
 
-        foreach ((string actorName, MaterialDataEntry material) in result.Materials)
+        foreach (string actorName in materials)
         {
-            hitPointRecover += material?.HitPointRecover ?? 0;
+            hitPointRecover += result.Materials[actorName]?.HitPointRecover ?? 0;
         }
 
         if (result.Recipe.ResultActorName == mealData.SystemData.FailActorName || result.Recipe.ResultActorName == "Item_Cook_O_02")
@@ -413,9 +518,9 @@ public class TearsMealsDataLoader
         // Setting crit chances
         int superSuccessRate = 0;
 
-        foreach ((string actorName, MaterialDataEntry material) in result.Materials)
+        foreach (string actorName in materials)
         {
-            superSuccessRate = Math.Max(superSuccessRate, material?.SpiceBoostSuccessRate ?? 0);
+            superSuccessRate = Math.Max(superSuccessRate, result.Materials[actorName]?.SpiceBoostSuccessRate ?? 0);
         }
 
         foreach (SuperSuccessRateListEntry item in mealData.SystemData.SuperSuccessRateList)
@@ -428,19 +533,122 @@ public class TearsMealsDataLoader
         }
 
         result.SuperSuccessRate = superSuccessRate;
+        bool hasExtract = false;
+
+        // Setting selling price
+        int sellingPrice = 0;
+        foreach (string actorName in materials)
+        {
+            if (result.Materials[actorName]?.CookLowPrice ?? false)
+            {
+                sellingPrice++;
+            }
+            else
+            {
+                sellingPrice += result.Materials[actorName]?.SellingPrice ?? 0;
+            }
+        }
+
+        foreach (PriceRateListEntry item in mealData.SystemData.PriceRateList)
+        {
+            if (item.MaterialNum == materials.Length)
+            {
+                sellingPrice = (int)Math.Floor(sellingPrice * item.Rate);
+            }
+        }
+
+        sellingPrice = Math.Max(sellingPrice, 3);
+        if (hardcodedExceptions.Contains(result.Recipe.ResultActorName))
+        {
+            sellingPrice = 2;
+        }
+
+        result.SellingPrice = sellingPrice;
 
         // Setting all possible combinations of Monster Extract effects, if there's a Monster Extract
         if (materials.Contains(mealData.SystemData.EnemyExtractActorName))
         {
             results = ProcessExtract(mealData, result);
-        }
-        else if (result.SuperSuccessRate < 100)
-        {
-            results.Add(result);
+            hasExtract = true;
         }
 
         // Setting all possible combinations of Critical Hit effects, if there's no Monster Extract
+        if (!hasExtract)
+        {
+            results = ProcessCritical(mealData, result);
+        }
 
+        // Setting eventual SpiceBoost
+        foreach (TearsMealsResult spiceResult in results)
+        {
+            foreach ((string, string) materialNameTag in materialCookTagList)
+            {
+                string actorName = materialNameTag.Item1;
+                string cookTag = materialNameTag.Item2;
+                if (cookTag != "CookEnemy")
+                {
+                    spiceResult.HitPointRecover += mealData.MaterialData[actorName]?.SpiceBoostHitPointRecover ?? 0;
+                    if (spiceResult.EffectTime > 0)
+                    {
+                        spiceResult.EffectTime += mealData.MaterialData[actorName]?.SpiceBoostEffectiveTime ?? 0;
+                    }
+                }
+                // unused in game. Logic is in the game's code, but no material has those properties
+                // (SpiceBoostMaxHeartLevel and SpiceBoostStaminaLevel)
+                if (cookTag == "CookSpice")
+                {
+                    if (spiceResult.Effect == "LifeMaxUp")
+                    {
+                        spiceResult.EffectLevel += mealData.MaterialData[actorName]?.SpiceBoostMaxHeartLevel ?? 0;
+                    }
+                    else if (spiceResult.Effect == "StaminaRecover" || spiceResult.Effect == "ExStaminaMaxUp")
+                    {
+                        spiceResult.EffectLevel += mealData.MaterialData[actorName]?.SpiceBoostStaminaLevel ?? 0;
+                    }
+                }
+            }
+        }
+
+        // Setting meal bonus, and final clamping of health, effect level and effect time
+        foreach (TearsMealsResult bonusResult in results)
+        {
+            if (bonusResult.Effect == "LifeMaxUp")
+            {
+                bonusResult.HitPointRecover = mealData.EffectData["LifeRecover"].MaxLv;
+            }
+            else
+            {
+                bonusResult.HitPointRecover = Math.Min(120, bonusResult.HitPointRecover + bonusResult.Recipe?.BonusHeart ?? 0);
+                if (bonusResult.HitPointRecover == 120)
+                {
+                    bonusResult.HitPointRecover = mealData.EffectData["LifeRecover"].MaxLv;
+                }
+                if (bonusResult.Effect == "None" && bonusResult.HitPointRecover == 0)
+                {
+                    bonusResult.HitPointRecover = 1;
+                }
+            }
+            if (bonusResult.Effect != "None")
+            {
+                bonusResult.EffectLevel = Math.Min(bonusResult.EffectLevel, mealData.EffectData[bonusResult.Effect].MaxLv);
+                if (bonusResult.EffectLevel <= 1.0f && bonusResult.EffectLevel > 0.0f)
+                {
+                    bonusResult.EffectLevel = 1.0f;
+                }
+                if (bonusResult.Effect == "LifeMaxUp" || bonusResult.Effect == "LifeRepair")
+                {
+                    bonusResult.EffectLevel = 4 * (float)Math.Round(bonusResult.EffectLevel / 4.0f);
+                    bonusResult.EffectLevel = (bonusResult.EffectLevel <= 4.0f && bonusResult.EffectLevel > 0.0f)
+                        ? 4.0f
+                        : bonusResult.EffectLevel;
+                }
+                bonusResult.EffectLevel = (float)Math.Floor(bonusResult.EffectLevel);
+                if (bonusResult.EffectTime > 0)
+                {
+                    bonusResult.EffectTime = Math.Min(1800, bonusResult.EffectTime + bonusResult.Recipe?.BonusTime ?? 0);
+                }
+            }
+        }
 
         return results;
     }

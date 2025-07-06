@@ -99,6 +99,10 @@ public class MaterialDataEntry
 
     public int SpiceBoostSuccessRate { get; set; }
 
+    public int SpiceBoostHitPointRecover { get; set; }
+
+    public bool CookLowPrice { get; set; }
+
     public MaterialDataEntry Clone()
     {
         return new MaterialDataEntry
@@ -115,7 +119,9 @@ public class MaterialDataEntry
             SpiceBoostEffectiveTime = this.SpiceBoostEffectiveTime,
             SpiceBoostMaxHeartLevel = this.SpiceBoostMaxHeartLevel,
             SpiceBoostStaminaLevel = this.SpiceBoostStaminaLevel,
-            SpiceBoostSuccessRate = this.SpiceBoostSuccessRate
+            SpiceBoostSuccessRate = this.SpiceBoostSuccessRate,
+            SpiceBoostHitPointRecover = this.SpiceBoostHitPointRecover,
+            CookLowPrice = this.CookLowPrice
         };
     }
 }
@@ -129,6 +135,8 @@ public class RecipeData
     public int PictureBookNum { get; set; }
 
     public int BonusHeart { get; set; }
+
+    public int BonusTime { get; set; }
 
     public bool IsSingleRecipe { get; set; }
 
@@ -144,6 +152,7 @@ public class RecipeData
             Recipe = this.Recipe,
             PictureBookNum = this.PictureBookNum,
             BonusHeart = this.BonusHeart,
+            BonusTime = this.BonusTime,
             IsSingleRecipe = this.IsSingleRecipe,
             CookFailure = this.CookFailure,
             CookEMedicine = this.CookEMedicine
